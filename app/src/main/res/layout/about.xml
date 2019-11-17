@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+ 
+ <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+ 	android:orientation="vertical"
+ 	android:layout_width="fill_parent"
+ 	android:layout_height="fill_parent"
+ 	android:padding="6dip">
+ 	<ImageView
+ 		android:src="@mipmap/ic_launcher"
+ 		android:layout_width="wrap_content"
+ 		android:layout_height="wrap_content"
+ 		android:layout_gravity="center"
+ 		android:paddingTop="10dip"/>
+ 	<TextView
+ 		android:id="@+id/about_top_label"
+ 		android:layout_width="wrap_content"
+ 		android:layout_height="wrap_content"
+ 		android:layout_gravity="center"
+ 		android:layout_weight="0"
+ 		android:paddingTop="15dip"/>
+ 	
+ 	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+ 		android:orientation="horizontal"
+ 		android:layout_width="fill_parent"
+ 		android:layout_height="fill_parent">
+		<Button
+			android:id="@+id/about_email"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="Email Developers"/>
+		<Button
+			android:id="@+id/about_license"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="Third party licenses"/>
+ 	 </LinearLayout>
+ </LinearLayout>

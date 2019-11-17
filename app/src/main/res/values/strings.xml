@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Folder Compare</string>
+    <string name="cmp_start">Comparison started...</string>
+    <string name="cmp_stop">Stopping comparison...</string>
+    <string name="pref_display_view">Display settings</string>
+    <string name="license_title">Third party licenses</string>
+    <string name="about_app">About Folder Compare</string>
+
+</resources>

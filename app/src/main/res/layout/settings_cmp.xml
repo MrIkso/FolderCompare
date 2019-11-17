@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+    
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent" >
+	<TableLayout
+		android:orientation="vertical"
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent"
+		android:stretchColumns="*"
+		android:shrinkColumns="*" android:background="@null">
+		
+		<TextView
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:text="Display settings"
+			android:textStyle="bold" />
+		<View
+			android:layout_width="fill_parent"
+			android:layout_height="5dip"
+			android:background="@null" />
+			<View
+				android:layout_width="fill_parent"
+				android:layout_height="3dip" />
+				
+		<TableRow>
+			<LinearLayout
+				android:orientation="vertical"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content" >
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:paddingLeft="3dip"
+					android:textSize="18sp"
+					android:textStyle="bold"
+					android:text="Show Only Equal" />
+				<TextView
+					android:layout_width="fill_parent"
+					android:layout_height="wrap_content"
+					android:singleLine="false"
+					android:paddingTop="3dip"
+					android:paddingLeft="8dip"
+					android:text="Display files and folders that have equal content" />
+			</LinearLayout>
+			<CheckBox
+				android:id="@+id/setting_only_eq"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:layout_gravity="right"
+				android:padding="3dp"
+				android:checked="false" />
+		</TableRow>
+			<View
+				android:layout_width="fill_parent"
+				android:layout_height="3dip" /> 
+				
+		<TableRow>
+			<LinearLayout
+				android:orientation="vertical"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content" >
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:paddingLeft="3dip"
+					android:textSize="18sp"
+					android:textStyle="bold"
+					android:text="Show Only Unique" />
+				<TextView
+					android:layout_width="fill_parent"
+					android:layout_height="wrap_content"
+					android:singleLine="false"
+					android:paddingTop="3dip"
+					android:paddingLeft="8dip"
+					android:text="Display files and folders that exists in one of two file lists only" />
+			</LinearLayout>
+			<CheckBox
+				android:id="@+id/setting_unique"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:layout_gravity="right"
+				android:padding="3dp"
+				android:checked="false" />
+		</TableRow>
+		<View
+			android:layout_width="fill_parent"
+			android:layout_height="3dip" />
+			
+		<TableRow>
+			<LinearLayout
+				android:orientation="vertical"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content" >
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:paddingLeft="3dip"
+					android:textSize="18sp"
+					android:textStyle="bold"
+					android:text="Show Only Compared" />
+				<TextView
+					android:layout_width="fill_parent"
+					android:layout_height="wrap_content"
+					android:singleLine="false"
+					android:paddingTop="3dip"
+					android:paddingLeft="8dip"
+					android:text="Display files and folders that have already been compared" />
+			</LinearLayout>
+			<CheckBox
+				android:id="@+id/setting_compared"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:layout_gravity="right"
+				android:padding="3dp"
+				android:checked="false" />
+		</TableRow>
+		
+		<View
+			android:layout_width="fill_parent"
+			android:layout_height="5dip" />
+		
+		<TableRow>
+			<LinearLayout
+				android:orientation="vertical"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content" >
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:paddingLeft="3dip"
+					android:textSize="18sp"
+					android:textStyle="bold"
+					android:text="Show Hidden" />
+				<TextView
+					android:layout_width="fill_parent"
+					android:layout_height="wrap_content"
+					android:singleLine="false"
+					android:paddingTop="3dip"
+					android:paddingLeft="8dip"
+					android:text="Display hidden files and folders" />
+			</LinearLayout>
+			<CheckBox
+				android:id="@+id/setting_hidden"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:layout_gravity="right"
+				android:padding="3dp"
+				android:checked="false" />
+		</TableRow>
+		
+		<View
+			android:layout_width="fill_parent"
+			android:layout_height="5dip" />
+		
+	</TableLayout>
+</ScrollView>

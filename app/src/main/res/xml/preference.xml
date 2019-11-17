@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+        <PreferenceCategory android:title="@string/pref_display_view">
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="setting_only_eq"
+                android:persistent="true"
+                android:summary="Display files and folders that have equal content"
+                android:title="Show Only Equal" />
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="setting_unique"
+                android:persistent="true"
+                android:summary="Display files and folders that exists in one of two file lists only"
+                android:title="Show Only Unique" />
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="setting_compared"
+                android:persistent="true"
+                android:summary="Display files and folders that have already been compared"
+                android:title="Show Only Compared" />
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="setting_hidden"
+                android:persistent="true"
+                android:summary="Display hidden files and folders"
+                android:title="Show Hidden" />
+        </PreferenceCategory>
+
+</PreferenceScreen>

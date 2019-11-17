@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.mrikso.foldercompare">
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+
+    <application
+        android:allowBackup="false"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme">
+        <activity
+            android:name=".app.FolderCompare"
+            android:label="@string/app_name" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".dialogs.CompareSettings" android:label="@string/app_name"></activity>
+        <activity android:name=".dialogs.FilterSettings" android:label="@string/app_name"></activity>
+        <activity android:name=".dialogs.DateTime" android:label="@string/app_name"></activity>
+        <activity android:name=".dialogs.FolderChooser" android:label="@string/app_name"></activity>
+        <activity android:name=".dialogs.About" android:label="@string/about_app"></activity>
+        <activity android:name=".dialogs.LicenseView" android:label="@string/license_title"></activity>
+        <activity android:name=".app.DiffView" android:label="@string/app_name"></activity>
+        
+    </application>
+
+</manifest>
