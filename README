@@ -1,6 +1,6 @@
 Easy to use folder and file (diff) comparison tool.
 
-Requires Android: Android 2.1 and up
+Requires Android: Android 4.0 and up
 
 Use it to find changes between two folders and
 to find differences between two different versions of a file.
@@ -31,7 +31,7 @@ lines	file(s)
  Diff Match and Patch
 
  Copyright 2006 Google Inc.
- http://code.google.com/p/google-diff-match-patch/
+ https://github.com/google/diff-match-patch/blob/master/java/src/name/fraser/neil/plaintext/diff_match_patch.java
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
