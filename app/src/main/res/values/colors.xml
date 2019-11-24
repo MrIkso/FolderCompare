@@ -3,7 +3,15 @@
 	<color name="equalFiles">#8800aa00</color>
 	<color name="newFiles">#D81B57</color>
 	<color name="diffFiles">#44a6caf0</color>
-	<color name="colorPrimary">#0277BD</color>
-	<color name="colorPrimaryDark">#0277BD</color>
-	<color name="colorAccent">#006064</color>
+    <color name="light_colorPrimary">#ffffff</color>
+	<color name="light_colorPrimaryDark">#ffffff</color>
+	<color name="light_colorAccent">#FF1744</color>
+	<color name="color_text_primary">#de000000</color>
+	<color name="color_text_secondary">#de000000</color>
+
+    <color name="dark_colorPrimary">#212121</color>
+	<color name="dark_colorPrimaryDark">#212121</color>
+	<color name="dark_colorAccent">#2979FF</color>
+	<color name="dark_color_text_primary">#deffff</color>
+	<color name="dark_color_text_secondary">#deffff</color>
 </resources>

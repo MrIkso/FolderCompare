@@ -4,10 +4,15 @@
 	android:layout_width="fill_parent"
 	android:layout_height="fill_parent"
 	android:orientation="horizontal">
+
+
 	<ImageView
+		android:layout_marginStart="6dp"
+		android:layout_marginEnd="6dp"
 	    android:id="@+id/row_image"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content" />
+
 	<LinearLayout
 		style="?android:attr/background"
 		android:layout_width="0dp"

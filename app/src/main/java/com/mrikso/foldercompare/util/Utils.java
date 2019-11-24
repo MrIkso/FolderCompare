@@ -22,12 +22,17 @@ along with FolderCompare Source Code.  If not, see <http://www.gnu.org/licenses/
 ===========================================================================
 */
 
-package com.mrikso.foldercompare.app;
+package com.mrikso.foldercompare.util;
 
 import android.Manifest;
-import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -113,11 +118,21 @@ public class Utils
 			int res = context.checkCallingOrSelfPermission(permission);
 			boolean isGranted = res == PackageManager.PERMISSION_GRANTED;
 			if (!isGranted) {
-				((Activity) context).requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE}, EXTERNAL_READ_PERMISSION_GRANT);
+				((AppCompatActivity) context).requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE}, EXTERNAL_READ_PERMISSION_GRANT);
 			}
 			return isGranted;
 		} else {   //Pre Marshmallow can rely on Manifest defined permissions.
 			return true;
+		}
+	}
+	public static boolean startActivity(@NonNull Intent intent, @NonNull Fragment fragment) {
+		try {
+			fragment.startActivity(intent);
+			return true;
+		} catch (ActivityNotFoundException | IllegalArgumentException e) {
+			e.printStackTrace();
+			//ToastUtils.show(R.string.activity_not_found, fragment.requireContext());
+			return false;
 		}
 	}
 }

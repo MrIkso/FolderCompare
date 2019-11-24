@@ -22,11 +22,13 @@ along with FolderCompare Source Code.  If not, see <http://www.gnu.org/licenses/
 ===========================================================================
 */
 
-package com.mrikso.foldercompare.app;
+package com.mrikso.foldercompare.activity;
 
-import android.app.Activity;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -35,20 +37,27 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.Checkable;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.mrikso.foldercompare.App;
+import com.mrikso.foldercompare.R;
+import com.mrikso.foldercompare.comparator.CompareItem;
+import com.mrikso.foldercompare.util.Utils;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-
-import com.mrikso.foldercompare.R;
-import com.mrikso.foldercompare.comparator.CompareItem;
+import java.util.List;
 
 public class FileListView {
+
     public final static int LIST_LEFT = 1;
     public final static int LIST_RIGHT = 2;
     private int listType;
@@ -68,13 +77,13 @@ public class FileListView {
         this.listType = listType;
 
         data = new ArrayList<>();
-
         FileListItem fileListAdaptor = new FileListItem();
         GetListView().setAdapter(fileListAdaptor);
-
         ClickEventHandler clickHandler = new ClickEventHandler();
         GetListView().setOnItemClickListener(clickHandler);
-
+        //GetListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+       //LongClickHandler longClickHandler = new LongClickHandler();
+       //GetListView().setOnItemLongClickListener(longClickHandler);
         TouchEventHandler touchHandler = new TouchEventHandler();
         GetListView().setOnTouchListener(touchHandler);
         GetDirView().setOnTouchListener(touchHandler);
@@ -84,7 +93,7 @@ public class FileListView {
     }
 
     public ListView GetListView() {
-        Activity a = (Activity) context;
+        AppCompatActivity a = (AppCompatActivity) context;
         int resId;
 
         resId = (listType == LIST_LEFT) ? R.id.left_list : R.id.right_list;
@@ -96,7 +105,7 @@ public class FileListView {
     }
 
     public TextView GetDirView() {
-        Activity a = (Activity) context;
+        AppCompatActivity a = (AppCompatActivity) context;
         int resId;
 
         resId = (listType == LIST_LEFT) ? R.id.left_dir : R.id.right_dir;
@@ -111,7 +120,7 @@ public class FileListView {
     }
 
     private void RestorePreferences() {
-        SharedPreferences p = ((Activity) context).getPreferences(android.content.Context.MODE_PRIVATE);
+        SharedPreferences p = ((AppCompatActivity) context).getPreferences(android.content.Context.MODE_PRIVATE);
         if (listType == LIST_LEFT) {
             dirPath = p.getString("left_path", null);
         } else {
@@ -131,16 +140,14 @@ public class FileListView {
     }
 
     private void SortFiles(File[] files) {
-        Arrays.sort(files, new Comparator<File>() {
-            public int compare(final File f1, final File f2) {
-                boolean isDir1 = f1.isDirectory();
-                boolean isDir2 = f2.isDirectory();
+        Arrays.sort(files, (f1, f2) -> {
+            boolean isDir1 = f1.isDirectory();
+            boolean isDir2 = f2.isDirectory();
 
-                if (isDir1 != isDir2)
-                    return isDir1 ? -1 : 1;
+            if (isDir1 != isDir2)
+                return isDir1 ? -1 : 1;
 
-                return f1.getName().compareTo(f2.getName());
-            }
+            return f1.getName().compareTo(f2.getName());
         });
     }
 
@@ -180,7 +187,7 @@ public class FileListView {
     }
 
     public boolean GoBackDir() {
-        if (dirPath != "/") {
+        if (!dirPath.equals("/")) {
             int index = dirPath.lastIndexOf('/');
             if (index != -1) {
                 String prevPath = dirPath.substring(0, index);
@@ -193,6 +200,39 @@ public class FileListView {
         return false;
     }
 
+/*
+    public void  toggleSelection(int position) {
+        selectView(position, mSelectedItemsIds.get(position));
+    }
+
+    // Remove selection after unchecked
+    public void  removeSelection() {
+        mSelectedItemsIds = new  SparseBooleanArray();
+        //notifyDataSetChanged();
+    }
+
+    // Item checked on selection
+
+    public void selectView(int position, boolean value) {
+        if (value)
+            mSelectedItemsIds.put(position,  value);
+        else
+
+            mSelectedItemsIds.delete(position);
+       // notifyDataSetChanged();
+    }
+
+    // Get number of selected item
+
+    public int  getSelectedCount() {
+        return mSelectedItemsIds.size();
+    }
+
+    public  SparseBooleanArray getSelectedIds() {
+        return mSelectedItemsIds;
+    }
+
+ */
     private class FileListItem extends ArrayAdapter<CompareItem> {
         private final static int KB = 1024;
         private final static int MB = KB * KB;
@@ -208,6 +248,7 @@ public class FileListView {
             super(context, R.layout.list_item, data);
         }
 
+        @SuppressLint("DefaultLocale")
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             ListItemHolder itemHolder;
@@ -234,7 +275,6 @@ public class FileListView {
                 itemHolder.bottomView.setText("");
                 itemHolder.topView.setText(fileName);
                 itemHolder.icon.setImageResource(R.drawable.up);
-                //convertView.setBackgroundColor( Color.BLACK );
                 return convertView;
             }
 
@@ -242,7 +282,6 @@ public class FileListView {
                 itemHolder.bottomView.setText("");
                 itemHolder.topView.setText("");
                 itemHolder.icon.setImageResource(0);
-                //convertView.setBackgroundColor( Color.BLACK );
                 return convertView;
             }
 
@@ -314,10 +353,59 @@ public class FileListView {
                 filePath += "/";
             filePath += fileName;
 
-            OpenDir(filePath);
+
+            if(new File(filePath).isDirectory()){
+                OpenDir(filePath);
+            }
+            else{
+                Toast.makeText(App.getContext(), "File Clicked", Toast.LENGTH_LONG).show();
+            }
         }
     }
+/*
+    private class LongClickHandler implements AdapterView.OnItemLongClickListener {
 
+        @Override
+        public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int position, long id) {
+            CompareItem cmpItem = data.get(position);
+
+            if (cmpItem.IsEmpty())
+                return true;
+
+            String fileName = cmpItem.GetFileName();
+            if (fileName.equals("..")) {
+                GoBackDir();
+                return true;
+            }
+
+            String filePath = dirPath;
+
+            if (!filePath.equals("/"))
+                filePath += "/";
+            filePath += fileName;
+
+            ViewGroup vp = (ViewGroup) arg1;
+
+            final int count = vp.getChildCount();
+
+            for(int i = 0; i < count; i++) {
+                final View child = vp.getChildAt(i);
+                if(child instanceof Checkable) {
+                    ((Checkable) child).setChecked(true);
+                }
+            }
+
+           if(new File(filePath).isDirectory()){
+               arg1.setBackgroundColor(Color.BLACK);
+                //Toast.makeText(App.getContext(), "Folder long Clicked", Toast.LENGTH_LONG).show();
+            }
+            else{
+                //Toast.makeText(App.getContext(), "File long Clicked", Toast.LENGTH_LONG).show();
+            }
+            return false;
+        }
+    }
+*/
     private class TouchEventHandler implements OnTouchListener {
         @Override
         public boolean onTouch(View view, MotionEvent arg1) {

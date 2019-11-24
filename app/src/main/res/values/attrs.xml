@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <item name="background" type="color" format="reference"/>
+
+    <attr name="popupOverlayStyle" format="reference"/>
+    <attr name="appBarLiftOnScroll" format="boolean" />
+    <attr name="simpleThemeTextPrimaryColor" format="color" />
+    <attr name="simpleThemeTextSecondaryColor" format="color" />
 </resources>

@@ -26,24 +26,21 @@ package com.mrikso.foldercompare.comparator;
 
 import android.os.Handler;
 import android.os.Message;
-import com.mrikso.foldercompare.FileComparator.ProgressHandler;
 
-public class CompareProgressHandler extends ProgressHandler
-{
-	private Handler mainHandler;
-	
-	public CompareProgressHandler( Handler mainHandler )
-	{
-		this.mainHandler = mainHandler;
-	}
+import com.mrikso.foldercompare.filecomparator.ProgressHandler;
 
-	@Override
-	protected void OnProgress()
-	{
-		if ( mainHandler != null )
-		{
-			Message msg = mainHandler.obtainMessage( progress, "OnProgress" );
-			mainHandler.sendMessage( msg );
-		}
-	}
+public class CompareProgressHandler extends ProgressHandler {
+    private Handler mainHandler;
+
+    public CompareProgressHandler(Handler mainHandler) {
+        this.mainHandler = mainHandler;
+    }
+
+    @Override
+    protected void OnProgress() {
+        if (mainHandler != null) {
+            Message msg = mainHandler.obtainMessage(progress, "OnProgress");
+            mainHandler.sendMessage(msg);
+        }
+    }
 }

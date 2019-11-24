@@ -22,15 +22,13 @@ along with FolderCompare Source Code.  If not, see <http://www.gnu.org/licenses/
 ===========================================================================
 */
 
-package com.mrikso.foldercompare.app;
+package com.mrikso.foldercompare.activity;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Handler;
 import android.os.Message;
 import android.util.DisplayMetrics;
@@ -49,8 +47,11 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.mrikso.foldercompare.R;
 import com.mrikso.foldercompare.comparator.CompareItem;
+import com.mrikso.foldercompare.util.Utils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -91,20 +92,20 @@ public class CompareListView {
         ClickEventHandler clickHandler = new ClickEventHandler();
         GetListView().setOnItemClickListener(clickHandler);
 
-        LongClickHandler longClickHandler = new LongClickHandler();
-        GetListView().setOnItemLongClickListener(longClickHandler);
+        ClickClickHandler longClickHandler = new ClickClickHandler();
+        GetListView().setOnItemClickListener(longClickHandler);
 
         TouchEventHandler touchHandler = new TouchEventHandler();
         GetListView().setOnTouchListener(touchHandler);
 
-        Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
+        Display display = ((AppCompatActivity) context).getWindowManager().getDefaultDisplay();
         DisplayMetrics displaymetrics = new DisplayMetrics();
         display.getMetrics(displaymetrics);
         displayWidth = displaymetrics.widthPixels;
     }
 
     public ListView GetListView() {
-        Activity a = (Activity) context;
+        AppCompatActivity a = (AppCompatActivity) context;
         return (ListView) a.findViewById(R.id.cmp_list);
     }
 
@@ -159,21 +160,19 @@ public class CompareListView {
         CharSequence[] option = {"Wait comparison completion", "Open"};
         builder.setTitle("Open folder");
         builder.setCancelable(false);
-        builder.setItems(option, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                switch (which) {
-                    case 0:
-                        confirmOpen = false;
-                        break;
+        builder.setItems(option, (dialog, which) -> {
+            switch (which) {
+                case 0:
+                    confirmOpen = false;
+                    break;
 
-                    case 1:
-                        if (cmpTaskHolder != null)
-                            cmpTaskHolder.Interrupt();
-                        confirmOpen = true;
-                        OpenDir(confirmOpenPath);
-                        confirmOpen = false;
-                        break;
-                }
+                case 1:
+                    if (cmpTaskHolder != null)
+                        cmpTaskHolder.Interrupt();
+                    confirmOpen = true;
+                    OpenDir(confirmOpenPath);
+                    confirmOpen = false;
+                    break;
             }
         });
 
@@ -204,7 +203,7 @@ public class CompareListView {
     public boolean GoBackDir(boolean isLeft) {
         String dirPath = isLeft ? pathLeft : pathRight;
 
-        if (dirPath != "/") {
+        if (!dirPath.equals("/")) {
             int index = dirPath.lastIndexOf('/');
             if (index != -1) {
                 String prevPath = dirPath.substring(0, index);
@@ -216,7 +215,6 @@ public class CompareListView {
 
         return false;
     }
-
 
     private class CompareListItem extends ArrayAdapter<CompareItem> {
         private final static int KB = 1024;
@@ -397,7 +395,7 @@ public class CompareListView {
         }
     }
 
-    private class LongClickHandler implements OnItemLongClickListener {
+    private class ClickClickHandler implements OnItemClickListener {
         private String leftPath, rightPath;
 
         /*
@@ -426,7 +424,7 @@ public class CompareListView {
         } */
 
         @Override
-        public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int position, long id) {
+        public void onItemClick(AdapterView<?> arg0, View arg1, int position, long id) {
             CompareItem cmpItemLeft, cmpItemRight;
             synchronized (dataMutex) {
                 cmpItemLeft = dataLeft.get(position);
@@ -437,14 +435,14 @@ public class CompareListView {
                     !cmpItemLeft.IsUnique() && !cmpItemLeft.IsEqualToOpposite()) {
                 leftPath = cmpItemLeft.GetFilePath();
                 rightPath = cmpItemRight.GetFilePath();
-                if(new File(leftPath).isDirectory() && new File(rightPath).isDirectory()){
-                   // Intent intent = new Intent(context, FolderCompare.class);
-                   // context.startActivity(intent);
+                if (new File(leftPath).isDirectory() && new File(rightPath).isDirectory()) {
+                    // Intent intent = new Intent(context, FolderCompare.class);
+                    // context.startActivity(intent);
                     //FolderCompare folderCompare = new FolderCompare();
                     //folderCompare.OnStartComparisonTask(leftPath, rightPath);
                     Toast.makeText(context, "Not compared!", Toast.LENGTH_LONG).show();
-                }else{
-                    Intent intent = new Intent(context, DiffView.class);
+                } else {
+                    Intent intent = new Intent(context, DiffViewActivity.class);
                     intent.putExtra("left_path", leftPath);
                     intent.putExtra("right_path", rightPath);
                     context.startActivity(intent);
@@ -452,7 +450,7 @@ public class CompareListView {
 
                 //ShowDlg();
             }
-            return false;
+
         }
     }
 }

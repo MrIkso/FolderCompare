@@ -1,16 +1,82 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
+        <item name="popupOverlayStyle">@style/AppTheme.PopupOverlay</item>
+        <item name="colorPrimary">@color/light_colorPrimaryDark</item>
+        <item name="colorPrimaryDark">@color/light_colorPrimaryDark</item>
+        <item name="colorAccent">@color/light_colorAccent</item>
+        <item name="appBarLiftOnScroll">false</item>
+        <item name="materialCardViewStyle">@style/Widget.CardView</item>
+        <item name="android:colorBackground">@color/light_colorPrimary</item>
+        <item name="android:dialogTheme">@style/AlertDialog.AppTheme.Light</item>
+        <item name="android:alertDialogTheme">@style/AlertDialog.AppTheme.Light</item>
+        <item name="simpleThemeTextPrimaryColor">@color/color_text_primary</item>
+        <item name="simpleThemeTextSecondaryColor">@color/color_text_secondary</item>
+
     </style>
 
+    <!-- Dark application theme. -->
+    <style name="AppThemeDark" parent="Theme.MaterialComponents.NoActionBar">
+        <item name="popupOverlayStyle">@style/AppTheme.PopupOverlay.Dark</item>
+        <item name="colorPrimary">@color/dark_colorPrimary</item>
+        <item name="colorPrimaryDark">@color/dark_colorPrimaryDark</item>
+        <item name="colorAccent">@color/dark_colorAccent</item>
+        <item name="appBarLiftOnScroll">false</item>
+        <item name="materialCardViewStyle">@style/Widget.CardView</item>
+        <item name="android:colorBackground">@color/dark_colorPrimary</item>
+        <item name="android:dialogTheme">@style/AlertDialog.AppTheme.Dark</item>
+        <item name="android:alertDialogTheme">@style/AlertDialog.AppTheme.Dark</item>
+        <item name="simpleThemeTextPrimaryColor">@color/dark_color_text_primary</item>
+        <item name="simpleThemeTextSecondaryColor">@color/dark_color_text_secondary</item>
 
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+    </style>
+    backgroundCustom
+  <!--  <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+-->
 
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+   <!-- <style name="AlertDialog.AppTheme.Light" parent="Theme.MaterialComponents.Dialog.Alert">
+        <item name="android:background">@color/dark_colorPrimaryDark</item>
+   &lt;!&ndash;     <item name="android:colorAccent">?attr/colorAccent</item>
+        <item name="colorAccent">?attr/colorAccent</item>
+        <item name="colorPrimary">?attr/colorAccent</item>
+        <item name="textColorAlertDialogListItem">?android:attr/textColorSecondary</item>
+        <item name="android:textColor">?android:attr/text</item>&ndash;&gt;
+        <item name="colorAccent">@color/dark_colorAccent</item>
+        <item name="colorPrimary">@color/dark_colorAccent</item>
+        <item name="dialogCornerRadius">@dimen/dialog_round</item>
+
+    </style>-->
+
+    <style name="AlertDialog.AppTheme.Light" parent="ThemeOverlay.MaterialComponents.Dialog.Alert">
+        <item name="android:background">@color/light_colorPrimary</item>
+        <item name="colorPrimary">@color/light_colorAccent</item>
+        <item name="colorAccent">@color/light_colorAccent</item>
+        <item name="dialogCornerRadius">@dimen/dialog_round</item>
+    </style>
+
+    <style name="AlertDialog.AppTheme.Dark" parent="ThemeOverlay.MaterialComponents.Dialog.Alert">
+        <item name="android:background">@color/dark_colorPrimaryDark</item>
+        <item name="colorPrimary">@color/dark_colorAccent</item>
+        <item name="colorAccent">@color/dark_colorAccent</item>
+        <item name="dialogCornerRadius">@dimen/dialog_round</item>
+    </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar" />
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.MaterialComponents.Light" />
+
+    <style name="AppTheme.PopupOverlay.Dark" parent="ThemeOverlay.MaterialComponents" />
+
+    <style name="Widget.CardView" parent="Widget.MaterialComponents.CardView">
+        <item name="android:stateListAnimator">@null</item>
+        <item name="cardElevation">0dp</item>
+        <item name="strokeColor">@color/mtrl_btn_stroke_color_selector</item>
+        <item name="strokeWidth">@dimen/mtrl_btn_stroke_size</item>
+    </style>
+
 
 </resources>

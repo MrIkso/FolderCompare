@@ -44,8 +44,9 @@ public class CompareSettings extends AppCompatActivity
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+        /*
         getWindow().requestFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.settings_cmp);
+      //  setContentView(R.layout.settings_cmp);
         
         Intent i = getIntent();
         cmpConfig.SetShowOnlyEq( i.getExtras().getBoolean( "only_eq" ) );
@@ -94,6 +95,8 @@ public class CompareSettings extends AppCompatActivity
 				intent.putExtra("hidden", isChecked);				
 			}
 		});
+
+         */
     }
     
 	@Override

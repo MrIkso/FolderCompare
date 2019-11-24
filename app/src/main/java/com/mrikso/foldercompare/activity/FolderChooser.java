@@ -22,37 +22,39 @@ along with FolderCompare Source Code.  If not, see <http://www.gnu.org/licenses/
 ===========================================================================
 */
 
-package com.mrikso.foldercompare.dialogs;
+package com.mrikso.foldercompare.activity;
 
-import android.app.Activity;
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
+import com.google.android.material.button.MaterialButton;
+import com.mrikso.foldercompare.R;
+import com.mrikso.foldercompare.util.Utils;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 
-import com.mrikso.foldercompare.R;
-import com.mrikso.foldercompare.app.Utils;
-
-public class FolderChooser extends Activity {
+public class FolderChooser extends BaseActivity {
     private Intent intent = new Intent();
 
     private Context context;
@@ -67,10 +69,10 @@ public class FolderChooser extends Activity {
         super.onCreate(savedInstanceState);
         getWindow().requestFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.folder_chooser);
-
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
         context = this;
-
-        data = new ArrayList<String>();
+        data = new ArrayList<>();
 
         Intent i = getIntent();
         defaultReportName = i.getExtras().getString("default_name");
@@ -83,44 +85,47 @@ public class FolderChooser extends Activity {
 
         GetFileEdit().setText(defaultReportName);
 
-        Button saveBtn = findViewById(R.id.chooser_save);
-        saveBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                filePath = dirPath;
-                if (!filePath.equals("/"))
-                    filePath += "/";
-                filePath += GetFileEdit().getText();
+        MaterialButton saveBtn = findViewById(R.id.chooser_save);
+        saveBtn.setOnClickListener(v -> {
+            filePath = dirPath;
+            if (!filePath.equals("/"))
+                filePath += "/";
+            filePath += GetFileEdit().getText();
 
-                boolean exists = new File(filePath).exists();
-                if (exists) {
-                    OnFileExists();
-                } else {
-                    intent.putExtra("path", filePath);
-                    finish();
-                }
+            boolean exists = new File(filePath).exists();
+            if (exists) {
+                OnFileExists();
+            } else {
+                intent.putExtra("path", filePath);
+                finish();
             }
         });
 
         OpenDir(defaultPath);
     }
-
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home: {
+                intent.putExtra("path", "");
+                finish();
+            }
+        }
+        return super.onOptionsItemSelected(item);
+    }
     private void OnFileExists() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         AlertDialog alert;
         CharSequence[] option = {"Overwrite file", "Cancel"};
         builder.setTitle("File Already Exists");
-        builder.setItems(option, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                switch (which) {
-                    case 0:
-                        intent.putExtra("path", filePath);
-                        finish();
-                        break;
-
-                    case 1:
-                        break;
-                }
+        builder.setItems(option, (dialog, which) -> {
+            switch (which) {
+                case 0:
+                    intent.putExtra("path", filePath);
+                    finish();
+                    break;
+                case 1:
+                    break;
             }
         });
 
@@ -129,31 +134,29 @@ public class FolderChooser extends Activity {
     }
 
     private TextView GetDirView() {
-        Activity a = (Activity) context;
+        AppCompatActivity a = (AppCompatActivity) context;
         return (TextView) a.findViewById(R.id.chooser_dir);
     }
 
     private ListView GetListView() {
-        Activity a = (Activity) context;
+        AppCompatActivity a = (AppCompatActivity) context;
         return (ListView) a.findViewById(R.id.chooser_list);
     }
 
     private EditText GetFileEdit() {
-        Activity a = (Activity) context;
+        AppCompatActivity a = (AppCompatActivity) context;
         return (EditText) a.findViewById(R.id.chooser_file_name);
     }
 
     private void SortFiles(File[] files) {
-        Arrays.sort(files, new Comparator<File>() {
-            public int compare(final File f1, final File f2) {
-                boolean isDir1 = f1.isDirectory();
-                boolean isDir2 = f2.isDirectory();
+        Arrays.sort(files, (f1, f2) -> {
+            boolean isDir1 = f1.isDirectory();
+            boolean isDir2 = f2.isDirectory();
 
-                if (isDir1 != isDir2)
-                    return isDir1 ? -1 : 1;
+            if (isDir1 != isDir2)
+                return isDir1 ? -1 : 1;
 
-                return f1.getName().compareTo(f2.getName());
-            }
+            return f1.getName().compareTo(f2.getName());
         });
     }
 
@@ -172,26 +175,20 @@ public class FolderChooser extends Activity {
             return false;
 
         SortFiles(files);
-
         data.clear();
-
         if (!dirPath.equals("/"))
             data.add("..");
-
         for (File f : files) {
             data.add(f.getName());
         }
-
         this.dirPath = dirPath;
         GetDirView().setText(dirPath);
-
         GetListView().invalidateViews();
-
         return true;
     }
 
     private boolean GoBackDir() {
-        if (dirPath != "/") {
+        if (!dirPath.equals("/")) {
             int index = dirPath.lastIndexOf('/');
             if (index != -1) {
                 String prevPath = dirPath.substring(0, index);
@@ -217,7 +214,6 @@ public class FolderChooser extends Activity {
         setResult(RESULT_CANCELED, intent);
     }
 
-
     private class FileListItem extends ArrayAdapter<String> {
         private final static int KB = 1024;
         private final static int MB = KB * KB;
@@ -233,6 +229,7 @@ public class FolderChooser extends Activity {
             super(context, R.layout.list_item, data);
         }
 
+        @SuppressLint("DefaultLocale")
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             ListItemHolder itemHolder;
@@ -257,7 +254,6 @@ public class FolderChooser extends Activity {
                 itemHolder.bottomView.setText("");
                 itemHolder.topView.setText(fileName);
                 itemHolder.icon.setImageResource(R.drawable.up);
-                //convertView.setBackgroundColor( Color.BLACK );
                 return convertView;
             }
 
@@ -305,9 +301,6 @@ public class FolderChooser extends Activity {
             }
 
             itemHolder.icon.setImageResource(resId);
-
-            //convertView.setBackgroundColor( Color.BLACK );
-
             return convertView;
         }
     }

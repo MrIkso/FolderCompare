@@ -29,9 +29,9 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 
-import com.mrikso.foldercompare.FileComparator.CompareStatistics;
+import com.mrikso.foldercompare.filecomparator.CompareStatistics;
 import com.mrikso.foldercompare.R;
-import com.mrikso.foldercompare.app.CompareListView;
+import com.mrikso.foldercompare.activity.CompareListView;
 import com.mrikso.foldercompare.comparator.CompareItem;
 
 import org.w3c.dom.Document;

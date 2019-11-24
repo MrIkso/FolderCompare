@@ -22,7 +22,7 @@ along with FolderCompare Source Code.  If not, see <http://www.gnu.org/licenses/
 ===========================================================================
 */
 
-package com.mrikso.foldercompare.FileComparator;
+package com.mrikso.foldercompare.filecomparator;
 
 public class CompareStatistics
 {

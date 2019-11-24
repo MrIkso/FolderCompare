@@ -22,30 +22,26 @@ along with FolderCompare Source Code.  If not, see <http://www.gnu.org/licenses/
 ===========================================================================
 */
 
-package com.mrikso.foldercompare.FileComparator;
+package com.mrikso.foldercompare.activity;
 
-public abstract class ProgressHandler
+import android.os.Bundle;
+
+import androidx.annotation.Nullable;
+
+import com.mrikso.foldercompare.fragment.AboutFragment;
+import com.mrikso.foldercompare.util.FragmentUtils;
+
+public class AboutActivity extends BaseActivity
 {
-	protected int dirsCompared;
-	protected int dirsTotal;
-	protected int progress;
-	
-	public void SetDirsTotal( int dirsTotal )
-	{
-		this.dirsTotal = dirsTotal;
+	@Override
+	protected void onCreate(@Nullable Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+
+		// Calls ensureSubDecor().
+		findViewById(android.R.id.content);
+
+		if (savedInstanceState == null) {
+			FragmentUtils.add(AboutFragment.newInstance(), this, android.R.id.content);
+		}
 	}
-	
-	public void SetDirsCompared( int dirsCompared )
-	{
-		this.dirsCompared = dirsCompared;
-		progress = (int)( ( (float)dirsCompared / (float)dirsTotal ) * 100.0f );
-		OnProgress();
-	}
-	
-	public int GetProgress()
-	{
-		return progress;
-	}
-	
-	protected abstract void OnProgress();
 }

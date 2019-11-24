@@ -22,41 +22,39 @@ along with FolderCompare Source Code.  If not, see <http://www.gnu.org/licenses/
 ===========================================================================
 */
 
-package com.mrikso.foldercompare.dialogs;
+package com.mrikso.foldercompare.filecomparator;
 
-import android.os.Bundle;
-import android.widget.TextView;
-
-import androidx.appcompat.app.AppCompatActivity;
-
-import com.mrikso.foldercompare.R;
-
-import java.io.InputStream;
-
-public class LicenseView extends AppCompatActivity
+public class TaskCompletionHandler
 {
-    @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
-        super.onCreate(savedInstanceState);
-        //getWindow().requestFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.license);
-        InputStream input = getResources().openRawResource( R.raw.license );
+	public void OnComplete()
+	{
+		taskCompleted = true;
 		try
 		{
-			byte[] fileData = new byte[ input.available() ];
-			input.read( fileData );
-			input.close();
-			GetListView().setText( new String( fileData, "UTF-8" ) );
+			synchronized( waitObject )
+			{
+				waitObject.wait();
+			}
 		}
-		catch( Exception e )
+		catch( InterruptedException e )
 		{
 			e.printStackTrace();
 		}
-    }
-    
-	private TextView GetListView()
-	{
-		return (TextView)findViewById( R.id.license_text );
 	}
+	
+	public boolean IsTaskCompleted()
+	{
+		return taskCompleted;
+	}
+	
+	public void CompletionAccepted()
+	{
+		synchronized( waitObject )
+		{
+			waitObject.notify();
+		}
+	}
+	
+	private boolean taskCompleted = false;
+	private Object waitObject = new Object();
 }

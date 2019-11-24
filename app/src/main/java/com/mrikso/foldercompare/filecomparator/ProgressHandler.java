@@ -22,21 +22,26 @@ along with FolderCompare Source Code.  If not, see <http://www.gnu.org/licenses/
 ===========================================================================
 */
 
-package com.mrikso.foldercompare.app;
+package com.mrikso.foldercompare.filecomparator;
 
-import com.mrikso.foldercompare.comparator.ComparePresentation;
+public abstract class ProgressHandler {
+    protected int dirsCompared;
+    protected int dirsTotal;
+    protected int progress;
 
-class ComparisonTaskHolder
-{
-	private ComparePresentation cmpPresentation;
+    public void SetDirsTotal(int dirsTotal) {
+        this.dirsTotal = dirsTotal;
+    }
 
-	public ComparisonTaskHolder( ComparePresentation cmpPresentation )
-	{
-		this.cmpPresentation = cmpPresentation;
-	}
-	
-	public void Interrupt()
-	{
-		cmpPresentation.Interrupt();
-	}
+    public void SetDirsCompared(int dirsCompared) {
+        this.dirsCompared = dirsCompared;
+        progress = (int) (((float) dirsCompared / (float) dirsTotal) * 100.0f);
+        OnProgress();
+    }
+
+    public int GetProgress() {
+        return progress;
+    }
+
+    protected abstract void OnProgress();
 }

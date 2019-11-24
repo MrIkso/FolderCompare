@@ -1,17 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/scroll_view"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:fillViewport="true"
-    android:scrollHorizontally="true"
-    android:fastScrollEnabled="true">
-      <TextView
-          android:id="@+id/license_text" 
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
+      <com.google.android.material.appbar.AppBarLayout
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:theme="?actionBarTheme">
+
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?actionBarSize"
+                app:navigationIcon="@drawable/back_icon_control_normal_24dp"/>
+      </com.google.android.material.appbar.AppBarLayout>
+      <ScrollView
+          android:id="@+id/scroll_view"
           android:layout_width="fill_parent"
           android:layout_height="fill_parent"
-          android:background="@android:color/white"
-          android:textColor="@android:color/black"
-          android:padding="10dip"
-          />
-</ScrollView>
+          android:fillViewport="true"
+          android:scrollHorizontally="true"
+          android:fastScrollEnabled="true">
+            <TextView
+                android:id="@+id/license_text"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:padding="10dip"
+                />
+      </ScrollView>
+</LinearLayout>

@@ -22,39 +22,21 @@ along with FolderCompare Source Code.  If not, see <http://www.gnu.org/licenses/
 ===========================================================================
 */
 
-package com.mrikso.foldercompare.FileComparator;
+package com.mrikso.foldercompare.activity;
 
-public class TaskCompletionHandler
+import com.mrikso.foldercompare.comparator.ComparePresentation;
+
+class ComparisonTaskHolder
 {
-	public void OnComplete()
+	private ComparePresentation cmpPresentation;
+
+	public ComparisonTaskHolder( ComparePresentation cmpPresentation )
 	{
-		taskCompleted = true;
-		try
-		{
-			synchronized( waitObject )
-			{
-				waitObject.wait();
-			}
-		}
-		catch( InterruptedException e )
-		{
-			e.printStackTrace();
-		}
+		this.cmpPresentation = cmpPresentation;
 	}
 	
-	public boolean IsTaskCompleted()
+	public void Interrupt()
 	{
-		return taskCompleted;
+		cmpPresentation.Interrupt();
 	}
-	
-	public void CompletionAccepted()
-	{
-		synchronized( waitObject )
-		{
-			waitObject.notify();
-		}
-	}
-	
-	private boolean taskCompleted = false;
-	private Object waitObject = new Object();
 }

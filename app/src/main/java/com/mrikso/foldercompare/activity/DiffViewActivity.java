@@ -22,8 +22,9 @@ along with FolderCompare Source Code.  If not, see <http://www.gnu.org/licenses/
 ===========================================================================
 */
 
-package com.mrikso.foldercompare.app;
+package com.mrikso.foldercompare.activity;
 
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -34,7 +35,10 @@ import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
+import com.mrikso.foldercompare.R;
+import com.mrikso.foldercompare.util.Utils;
 
 import java.io.File;
 import java.util.LinkedList;
@@ -42,12 +46,9 @@ import java.util.LinkedList;
 import diff.diff_match_patch;
 import diff.diff_match_patch.Diff;
 
-import com.mrikso.foldercompare.R;
-import com.mrikso.foldercompare.dialogs.FolderChooser;
+public class DiffViewActivity extends BaseActivity {
 
-public class DiffView extends AppCompatActivity {
     private static final int MENU_SAVE_REPORT = 1;
-
     private static final int RESULT_CHOOSER = 12;
 
     private String leftPath, rightPath;
@@ -57,24 +58,28 @@ public class DiffView extends AppCompatActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // getWindow().requestFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.diff);
+        setContentView(R.layout.text_diff);
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        comparator = new diff_match_patch();
+        Intent i = getIntent();
+        leftPath = i.getExtras().getString("left_path");
+        rightPath = i.getExtras().getString("right_path");
 
-            comparator = new diff_match_patch();
-            Intent i = getIntent();
-            leftPath = i.getExtras().getString("left_path");
-            rightPath = i.getExtras().getString("right_path");
-
+        //Compare two txt files
         AsyncTaskRunner runner = new AsyncTaskRunner();
         runner.execute();
-            //Thread thread = new Thread(CompareFiles());
     }
+
+    @SuppressLint("StaticFieldLeak")
     private class AsyncTaskRunner extends AsyncTask<String, String, String> {
 
         ProgressDialog progressDialog;
+
         @Override
         protected String doInBackground(String... params) {
-             String resp = CompareFiles();
+            String resp = CompareFiles();
             return resp;
         }
 
@@ -87,7 +92,7 @@ public class DiffView extends AppCompatActivity {
 
         @Override
         protected void onPreExecute() {
-            progressDialog = ProgressDialog.show(DiffView.this,
+            progressDialog = ProgressDialog.show(DiffViewActivity.this,
                     "Comparing file",
                     "Wait for compare files to complete");
         }
@@ -102,7 +107,9 @@ public class DiffView extends AppCompatActivity {
         }
 
         private String DiffToHTML(LinkedList<Diff> diffs) {
-            String html = "";
+            String html = "File 1: <b></b><font color=\"#0bff0b\">"
+                    + rightPath +"</font><br>File 2: <b></b><font color=\"#ff0b0b\">"
+                    + leftPath + "</font><br>";
             String s;
 
             for (Diff d : diffs) {
@@ -137,12 +144,12 @@ public class DiffView extends AppCompatActivity {
 
         private String CompareFiles() {
             if (!new File(leftPath).canRead()) {
-                Toast.makeText(DiffView.this, "Can't read file: " + leftPath, Toast.LENGTH_SHORT).show();
+                Toast.makeText(DiffViewActivity.this, "Can't read file: " + leftPath, Toast.LENGTH_SHORT).show();
                 return "";
             }
 
             if (!new File(rightPath).canRead()) {
-                Toast.makeText(DiffView.this, "Can't read file: " + rightPath, Toast.LENGTH_SHORT).show();
+                Toast.makeText(DiffViewActivity.this, "Can't read file: " + rightPath, Toast.LENGTH_SHORT).show();
                 return "";
             }
 
@@ -150,10 +157,9 @@ public class DiffView extends AppCompatActivity {
             String text2 = Utils.ReadFileAsString(rightPath);
             diffs = comparator.diff_main(text1, text2, true);
             comparator.diff_cleanupSemantic(diffs);
-            String diffHtml = DiffToHTML(diffs);
-            return diffHtml;
+            return DiffToHTML(diffs);
 
-           // GetListView().setText(Html.fromHtml(diffHtml));
+            // GetListView().setText(Html.fromHtml(diffHtml));
             //GetListView().setTextIsSelectable(true);
         }
 
@@ -162,6 +168,7 @@ public class DiffView extends AppCompatActivity {
             GetListView().setTextIsSelectable(true);
         }
     }
+
     private void SaveReport(String reportPath) {
         String diffHtml = comparator.diff_prettyHtml(diffs);
         String out = "";
@@ -179,7 +186,7 @@ public class DiffView extends AppCompatActivity {
     }
 
     private void OnMenuSaveReport() {
-        Intent intent = new Intent(DiffView.this, FolderChooser.class);
+        Intent intent = new Intent(DiffViewActivity.this, FolderChooser.class);
         intent.putExtra("default_name", "FileComparisonReport.html");
         startActivityForResult(intent, RESULT_CHOOSER);
     }
@@ -214,6 +221,10 @@ public class DiffView extends AppCompatActivity {
             case MENU_SAVE_REPORT:
                 OnMenuSaveReport();
                 return true;
+            case android.R.id.home: {
+                finish();
+                return true;
+            }
         }
         return super.onOptionsItemSelected(item);
     }

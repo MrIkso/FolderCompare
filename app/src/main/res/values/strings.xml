@@ -4,7 +4,22 @@
     <string name="cmp_start">Comparison started...</string>
     <string name="cmp_stop">Stopping comparison...</string>
     <string name="pref_display_view">Display settings</string>
-    <string name="license_title">Third party licenses</string>
-    <string name="about_app">About Folder Compare</string>
-
+    <string name="pref_theme">App theme</string>
+    <string name="action_settings">Settings</string>
+    <string name="menu_about">About App</string>
+    <string name="menu_compare">Start Compare</string>
+    <string name="menu_exit">Exit</string>
+    <string name="menu_stop_compare">Stop Comparing</string>
+    <string name="menu_result_compare">Result</string>
+    <string name="text_compare">Text Compare</string>
+    <string name="about_version_title">Version</string>
+    <string name="about_github_title">View on GitHub</string>
+    <string name="about_licenses_title">Licenses</string>
+    <string name="about_author_title">Author</string>
+    <string name="about_author_name_title">Mr Ikso</string>
+    <string name="about_author_github_title">Follow on GitHub</string>
+    <string name="app_version" translatable="false">1.0.0</string>
+    <string name="pref_filter_view">Filters</string>
+    <string name="btn_save_result">Save</string>
+    <string name="compare_save_result">Save Result</string>
 </resources>

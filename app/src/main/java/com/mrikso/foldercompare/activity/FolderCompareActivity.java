@@ -22,10 +22,9 @@ along with FolderCompare Source Code.  If not, see <http://www.gnu.org/licenses/
 ===========================================================================
 */
 
-package com.mrikso.foldercompare.app;
+package com.mrikso.foldercompare.activity;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
@@ -34,37 +33,29 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Handler.Callback;
 import android.os.Message;
+import android.util.Log;
 import android.view.Display;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
-
-import com.mrikso.foldercompare.FileComparator.CompareStatistics;
+import com.google.android.material.bottomappbar.BottomAppBar;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.mrikso.foldercompare.App;
 import com.mrikso.foldercompare.R;
 import com.mrikso.foldercompare.comparator.CompareConfig;
 import com.mrikso.foldercompare.comparator.ComparePresentation;
 import com.mrikso.foldercompare.comparator.FilterParams;
-import com.mrikso.foldercompare.dialogs.About;
-import com.mrikso.foldercompare.dialogs.CompareSettings;
-import com.mrikso.foldercompare.dialogs.FilterSettings;
-import com.mrikso.foldercompare.dialogs.FolderChooser;
+import com.mrikso.foldercompare.filecomparator.CompareStatistics;
 import com.mrikso.foldercompare.report.ReportGenerator;
+import com.mrikso.foldercompare.util.Utils;
 
-public class FolderCompare extends AppCompatActivity {
-    private static final int MENU_COMPARISON_OP = 1;
-    private static final int MENU_SETTINGS = 2;
-    private static final int MENU_RESULTS = 3;
-    private static final int MENU_ABOUT = 4;
-    private static final int MENU_EXIT = 5;
+public class FolderCompareActivity extends BaseActivity {
 
     private static final int SETTINGS_COMPARE = 10;
     private static final int SETTINGS_FILTER = 11;
@@ -86,45 +77,51 @@ public class FolderCompare extends AppCompatActivity {
     private boolean comparisonViewVisible;
 
     private boolean exiting;
-
-    private FolderCompare mainActivity;
+    private BottomAppBar bottomAppBar;
+    private FloatingActionButton fab;
+    private FolderCompareActivity mainActivity;
+    private Menu globalMenu;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //getWindow().requestFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.main);
-        if(Utils.checkStorageAccessPermissions(this)) {
+        setContentView(R.layout.activity_main);
+        //  Toolbar toolbar = findViewById(R.id.toolbar);
+
+        // setSupportActionBar(toolbar);
+        bottomAppBar = findViewById(R.id.bottom_App_bar);
+        bottomAppBar.setFabCradleMargin(0f); //initial default value 17f
+        bottomAppBar.replaceMenu(R.menu.options_menu);
+        setSupportActionBar(bottomAppBar);
+        fab = findViewById(R.id.fab_bottom_appbar);
+        if (Utils.checkStorageAccessPermissions(this)) {
         } else {
             Toast.makeText(this, "Can't read folder due to permissions. Permission denied!", Toast.LENGTH_SHORT).show();
             System.exit(0);
         }
         mainActivity = this;
-
         cmpConfig = new CompareConfig();
         cmpConfig.SetShowHidden(true);
         fltParams = new FilterParams();
         statistics = new CompareStatistics();
-
         mainHandler = new Handler(new HandlerCallback());
-
         listSelector = new ListSelector();
-
         leftList = new FileListView(this, listSelector, FileListView.LIST_LEFT);
         rightList = new FileListView(this, listSelector, FileListView.LIST_RIGHT);
-
         listSelector.SetListView(leftList, rightList);
-
         cmpList = new CompareListView(this, listSelector, mainHandler);
-
         reportGen = new ReportGenerator(this, cmpList, statistics);
-
         InitHandlers();
     }
 
     private void InitHandlers() {
-        ImageButton stopComparison = findViewById(R.id.progress_stop);
-        stopComparison.setOnClickListener(new StopComparisonHandler());
+        RelativeLayout progress_panel = findViewById(R.id.progress_panel);
+        progress_panel.setVisibility(RelativeLayout.GONE);
+        fab.setOnClickListener(view -> {
+            OnStartComparisonTask();
+            Toast.makeText(App.getContext(), "Start Compare task", Toast.LENGTH_LONG).show();
+            Log.i("FolderCompare", "Start Compare task");
+        });
     }
 
     private void SavePreferences() {
@@ -149,6 +146,14 @@ public class FolderCompare extends AppCompatActivity {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.options_menu, menu);
+        globalMenu = menu;
+        return true;
+    }
+
+    @Override
     public void onBackPressed() {
         FileListView selected;
         boolean back = false;
@@ -170,7 +175,7 @@ public class FolderCompare extends AppCompatActivity {
                 }
             }
         }
-
+        globalMenu.findItem(R.id.menu_result_compare).setVisible(false);
         if (!back) {
             if (!listSelector.GetAttemptExit()) {
                 Toast.makeText(this, "Press back again to quit.", Toast.LENGTH_SHORT).show();
@@ -186,31 +191,40 @@ public class FolderCompare extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (resultCode == RESULT_CANCELED) {
-            if (requestCode == SETTINGS_COMPARE) {
-                cmpConfig.SetShowOnlyEq(data.getBooleanExtra("only_eq", false));
-                cmpConfig.SetShowFilesNotExistsOnly(data.getBooleanExtra("unique", false));
-                cmpConfig.SetShowOnlyCompared(data.getBooleanExtra("compared", false));
-                cmpConfig.SetShowHidden(data.getBooleanExtra("hidden", false));
-            } else if (requestCode == SETTINGS_FILTER) {
-                fltParams.SetSize(data.getLongExtra("size_from", -1), data.getLongExtra("size_to", -1));
-                fltParams.SetTime(data.getLongExtra("time_from", -1), data.getLongExtra("time_to", -1));
-                fltParams.AddNames(data.getStringArrayListExtra("names"));
-                fltParams.SetUseFilter(data.getBooleanExtra("use_filter", false));
-            } else if (requestCode == RESULT_CHOOSER) {
-                String filePath = data.getStringExtra("path");
-                if (filePath.length() > 0) {
-                    reportGen.Generate(filePath);
-                }
+            switch (requestCode) {
+                case SETTINGS_COMPARE:
+                    cmpConfig.SetShowOnlyEq(data.getBooleanExtra("only_eq", false));
+                    cmpConfig.SetShowFilesNotExistsOnly(data.getBooleanExtra("unique", false));
+                    cmpConfig.SetShowOnlyCompared(data.getBooleanExtra("compared", false));
+                    cmpConfig.SetShowHidden(data.getBooleanExtra("hidden", false));
+                    break;
+                case SETTINGS_FILTER:
+                    fltParams.SetSize(data.getLongExtra("size_from", -1), data.getLongExtra("size_to", -1));
+                    fltParams.SetTime(data.getLongExtra("time_from", -1), data.getLongExtra("time_to", -1));
+                    fltParams.AddNames(data.getStringArrayListExtra("names"));
+                    fltParams.SetUseFilter(data.getBooleanExtra("use_filter", false));
+                    break;
+                case RESULT_CHOOSER:
+                    String filePath = data.getStringExtra("path");
+                    assert filePath != null;
+                    if (filePath.length() > 0) {
+                        reportGen.Generate(filePath);
+                    }
+                    break;
+                default:
+                    break;
             }
         }
     }
 
     private void OnMenuSettings() {
+        Intent settings = new Intent(FolderCompareActivity.this, SettingsActivity.class);
+        startActivity(settings);
+        /*
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         AlertDialog alert;
         CharSequence[] option = {"Comparison Settings", "Filter Settings"};
         builder.setTitle("Settings");
-        //builder.setIcon(R.drawable.settings);
         builder.setItems(option, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 Intent settings_intent;
@@ -223,9 +237,8 @@ public class FolderCompare extends AppCompatActivity {
                         settings_intent.putExtra("hidden", cmpConfig.GetShowHidden());
                         startActivityForResult(settings_intent, SETTINGS_COMPARE);
                         break;
-
                     case 1:
-                        settings_intent = new Intent(mainActivity, FilterSettings.class);
+                        settings_intent = new Intent(mainActivity, FilterSettingsActivity.class);
                         settings_intent.putExtra("size_from", fltParams.GetSizeFrom());
                         settings_intent.putExtra("size_to", fltParams.GetSizeTo());
                         settings_intent.putExtra("time_from", fltParams.GetTimeFrom());
@@ -240,6 +253,8 @@ public class FolderCompare extends AppCompatActivity {
 
         alert = builder.create();
         alert.show();
+
+         */
     }
 
     private void OnMenuResults() {
@@ -247,30 +262,13 @@ public class FolderCompare extends AppCompatActivity {
             Toast.makeText(this, "Wait comparison completion", Toast.LENGTH_SHORT).show();
             return;
         }
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        AlertDialog alert;
-        CharSequence[] option = {"Generate Report"};
-        builder.setTitle("Comparison Results");
-        //builder.setIcon(R.drawable.save);
-        builder.setItems(option, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                switch (which) {
-                    case 0:
-                        Intent intent = new Intent(mainActivity, FolderChooser.class);
-                        intent.putExtra("default_name", "FolderComparisonReport.html");
-                        startActivityForResult(intent, RESULT_CHOOSER);
-                        break;
-                }
-            }
-        });
-
-        alert = builder.create();
-        alert.show();
+        Intent intent = new Intent(mainActivity, FolderChooser.class);
+        intent.putExtra("default_name", "FolderComparisonReport.html");
+        startActivityForResult(intent, RESULT_CHOOSER);
     }
 
     private void OnMenuAbout() {
-        Intent intent = new Intent(mainActivity, About.class);
+        Intent intent = new Intent(mainActivity, AboutActivity.class);
         startActivity(intent);
     }
 
@@ -280,17 +278,18 @@ public class FolderCompare extends AppCompatActivity {
         finish();
     }
 
+    @SuppressLint("DefaultLocale")
     private void SetProgress(int percent) {
         ProgressBar progressBar = findViewById(R.id.progress_bar);
         progressBar.setProgress(percent);
 
         TextView text = findViewById(R.id.progress_percent);
-        text.setText(percent + "%");
+        text.setText(String.format("%d%%", percent));
     }
 
     private int GetScreenOrientation() {
         Display getOrient = getWindowManager().getDefaultDisplay();
-        int orientation = Configuration.ORIENTATION_UNDEFINED;
+        int orientation;
         if (getOrient.getWidth() == getOrient.getHeight()) {
             orientation = Configuration.ORIENTATION_SQUARE;
         } else {
@@ -313,18 +312,23 @@ public class FolderCompare extends AppCompatActivity {
         cmpPresentation.SetCompareStatistics(statistics);
         cmpTaskHolder = new ComparisonTaskHolder(cmpPresentation);
         cmpList.OnStartComparison(cmpTaskHolder);
-
+        InitHandlers();
         TextView text = findViewById(R.id.progress_text);
         text.setText(getString(R.string.cmp_start));
         SetProgress(0);
+        fab.setImageResource(R.drawable.ic_stop_black_24dp);
+        fab.setOnClickListener((v) -> {
+            OnStopComparisonTask();
+            Toast.makeText(App.getContext(), "Stop Compare task", Toast.LENGTH_LONG).show();
+            Log.i("FolderCompare", "Stop Compare task");
+        });
 
         RelativeLayout progress_panel = findViewById(R.id.progress_panel);
         progress_panel.setVisibility(RelativeLayout.VISIBLE);
-
         int orient = GetScreenOrientation();
         setRequestedOrientation(orient);
-
         new Thread(cmpPresentation).start();
+
     }
 
     public void OnStopComparisonTask() {
@@ -333,15 +337,20 @@ public class FolderCompare extends AppCompatActivity {
             text.setText(getString(R.string.cmp_stop));
             cmpTaskHolder.Interrupt();
             cmpTaskHolder = null;
+            comparisonInProcess = false;
         }
     }
 
     public void OnComparisonTaskCompleted() {
         RelativeLayout progress_panel = findViewById(R.id.progress_panel);
-        progress_panel.setVisibility(RelativeLayout.GONE);
+        progress_panel.setVisibility(RelativeLayout.GONE);;
         comparisonInProcess = false;
+        fab.setImageResource(R.drawable.ic_compare_black_24dp);
+        globalMenu.findItem(R.id.menu_result_compare).setVisible(true);
+        InitHandlers();
     }
 
+    /*
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         MenuItem item;
@@ -369,11 +378,13 @@ public class FolderCompare extends AppCompatActivity {
 
         return super.onPrepareOptionsMenu(menu);
     }
-
+*/
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+
         switch (item.getItemId()) {
-            case MENU_COMPARISON_OP:
+            /*
+            case R.id.menu_compare:
                 if (comparisonInProcess) {
                     OnStopComparisonTask();
                 } else {
@@ -381,33 +392,39 @@ public class FolderCompare extends AppCompatActivity {
                 }
                 return true;
 
-            case MENU_SETTINGS:
+            case R.id.menu_stop_compare:
+                OnStopComparisonTask();
+                return true;
+
+             */
+            case R.id.menu_settings:
                 OnMenuSettings();
                 return true;
 
-            case MENU_RESULTS:
+            case R.id.menu_result_compare:
                 OnMenuResults();
                 return true;
 
-            case MENU_ABOUT:
+            case R.id.menu_about:
                 OnMenuAbout();
                 return true;
 
-            case MENU_EXIT:
+            case R.id.menu_exit:
                 OnMenuExit();
                 return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
-
-    private class StopComparisonHandler implements OnClickListener {
-        @Override
-        public void onClick(View arg0) {
-            OnStopComparisonTask();
+    /*
+        private class StopComparisonHandler implements OnClickListener {
+            @Override
+            public void onClick(View arg0) {
+                OnStopComparisonTask();
+            }
         }
-    }
 
+     */
     private class HandlerCallback implements Callback {
         public boolean handleMessage(Message msg) {
             String s = (String) msg.obj;

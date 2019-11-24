@@ -22,7 +22,7 @@ along with FolderCompare Source Code.  If not, see <http://www.gnu.org/licenses/
 ===========================================================================
 */
 
-package com.mrikso.foldercompare.dialogs;
+package com.mrikso.foldercompare.activity;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -39,12 +39,11 @@ import android.widget.CheckBox;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import com.mrikso.foldercompare.R;
 import com.mrikso.foldercompare.comparator.FilterParams;
+import com.mrikso.foldercompare.dialogs.DateTime;
 
-public class FilterSettings extends AppCompatActivity
+public class FilterSettingsActivity extends BaseActivity
 {
 	private static final int TIME_FROM = 1;
 	private static final int TIME_TO   = 2;
